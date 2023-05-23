@@ -21,7 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class RegistrationActivity extends AppCompatActivity {
-    private EditText etUsername, etPassword;
+    private EditText etUsername, etPassword, etPassword2;
     private Button btnRegister;
     private Button btn_login;
 
@@ -32,6 +32,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         etUsername = findViewById(R.id.et_username);
         etPassword = findViewById(R.id.et_password);
+        etPassword2 = findViewById(R.id.et_password2);
         btnRegister = findViewById(R.id.btn_register);
         btn_login = findViewById(R.id.btn_login);
 
@@ -54,11 +55,13 @@ public class RegistrationActivity extends AppCompatActivity {
     private void registerUser() {
         String username = etUsername.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
+        String password2 = etPassword2.getText().toString().trim();
 
         JSONObject jsonRequest = new JSONObject();
         try {
             jsonRequest.put("username", username);
             jsonRequest.put("password", password);
+            jsonRequest.put("password2", password2);
             System.out.println(username);
             System.out.println(password);
 
@@ -100,7 +103,7 @@ public class RegistrationActivity extends AppCompatActivity {
                                 // Переход к экрану авторизации
                                 Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
                                 startActivity(intent);
-                                finish(); // Закрываем текущую активити, чтобы пользователь не мог вернуться по кнопке "назад"
+                                finish();
                             }
                         });
                     } else {

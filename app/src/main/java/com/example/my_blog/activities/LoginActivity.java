@@ -95,6 +95,8 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         });
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.putExtra("name", etUsername.getText().toString().trim());
+                        intent.putExtra("password", etPassword.getText().toString().trim());
                         startActivity(intent);
                         finish();
                     } else {

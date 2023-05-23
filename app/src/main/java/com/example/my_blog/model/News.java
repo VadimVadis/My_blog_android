@@ -3,7 +3,7 @@ package com.example.my_blog.model;
 public class News {
     private String title;
     private String pictureUrl;
-    private String category;
+    private int category_id;
     private String content;
     private String name;
 
@@ -34,12 +34,16 @@ public class News {
         this.pictureUrl = pictureUrl;
     }
 
+    private static final String[] categories_name = {"Развлечение", "Мир", "Наши новости", "Компьютерные технологии", "Для детей"};
     public String getCategory() {
-        return category;
+        if (category_id < 1 || category_id >= categories_name.length){
+            return "-------";
+        }
+        return categories_name[category_id-1];
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategory(int category_id) {
+        this.category_id = category_id;
     }
 
     public String getContent() {
