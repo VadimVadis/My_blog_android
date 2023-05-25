@@ -63,7 +63,6 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Отправка данных на сервер
         sendRequest(jsonRequest.toString());
     }
 
@@ -96,11 +95,9 @@ public class LoginActivity extends AppCompatActivity {
                         });
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         intent.putExtra("name", etUsername.getText().toString().trim());
-                        intent.putExtra("password", etPassword.getText().toString().trim());
                         startActivity(intent);
                         finish();
                     } else {
-                        // Ошибка при авторизации
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

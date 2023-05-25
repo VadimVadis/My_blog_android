@@ -36,7 +36,8 @@ public class News {
 
     private static final String[] categories_name = {"Развлечение", "Мир", "Наши новости", "Компьютерные технологии", "Для детей"};
     public String getCategory() {
-        if (category_id < 1 || category_id >= categories_name.length){
+        System.out.println(category_id);
+        if (category_id < 1 || category_id > categories_name.length){
             return "-------";
         }
         return categories_name[category_id-1];

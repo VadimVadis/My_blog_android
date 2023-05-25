@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     private NewsAdapter newsAdapter;
     private ArrayList<News> news;
     private String name;
-    private String password;
     private RequestQueue requestQueue;
     private Button dropdownButton;
     private PopupWindow popupWindow;
@@ -59,16 +58,14 @@ public class MainActivity extends AppCompatActivity {
         getNews(0);
         dropdownButton = findViewById(R.id.dropdown_button);
         Intent intent = getIntent();
-        String name1 = intent.getStringExtra("name");
-        String password1 = intent.getStringExtra("password");
-        name = name1;
-        password = password1;
+        name = intent.getStringExtra("name");
 
         Button createNewsButton = findViewById(R.id.create_button);
         createNewsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, CreateNewsActivity.class);
+                intent.putExtra("name", name);
                 startActivity(intent);
             }
         });
@@ -149,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         try {
                             JSONArray jsonArray = response.getJSONArray("news");
-                            for (int i = 0; i < jsonArray.length(); i++) {
+                            for (int i = jsonArray.length() - 1; i >= 0; i--) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
                                 String title = jsonObject.getString("title");

@@ -36,9 +36,9 @@
             android:id="@+id/create_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button"
-            android:translationX="400px"
-            android:translationY="400px" />
+            android:layout_alignParentRight="true"
+            android:text="Создать news" />
+
 
     </RelativeLayout>
 

@@ -6,23 +6,39 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import com.example.my_blog.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class CreateNewsActivity extends Activity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 2;
     private static final int REQUEST_CHOOSE_PICTURE = 3;
-
+    private String name;
     private EditText titleEditText;
     private Spinner categorySpinner;
     private ImageView imageView;
@@ -39,6 +55,8 @@ public class CreateNewsActivity extends Activity {
         categorySpinner = findViewById(R.id.categorySpinner);
         imageView = findViewById(R.id.imageView_select);
         textEditText = findViewById(R.id.textEditText);
+        Intent intent = getIntent();
+        name = intent.getStringExtra("name");
 
         Button takePhotoButton = findViewById(R.id.takePhotoButton);
         takePhotoButton.setOnClickListener(new View.OnClickListener() {
@@ -117,9 +135,93 @@ public class CreateNewsActivity extends Activity {
         String title = titleEditText.getText().toString();
         String category = categorySpinner.getSelectedItem().toString();
         String text = textEditText.getText().toString();
+        System.out.println(title + " " + category + " " + text);
+        if (imageBitmap != null) {
+            String base64Image = convertBitmapToBase64(imageBitmap);
+            sendNews(title, category, text, base64Image);
+            System.out.println(base64Image);
+        } else {
+            sendNews(title, category, text, null);
+        }
 
-        System.out.println("Заголовок: " + title);
-        System.out.println("Категория: " + category);
-        System.out.println("Текст: " + text);
+    }
+
+    private void sendNews(String title, String category, String text, String base64Image) {
+        JSONObject jsonRequest = new JSONObject();
+        try {
+            jsonRequest.put("name", name);
+            jsonRequest.put("title", title);
+            jsonRequest.put("category", category);
+            System.out.println(category);
+            jsonRequest.put("text", text);
+            if (base64Image != null) {
+                jsonRequest.put("base64Image", base64Image);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        sendRequest(jsonRequest.toString());
+    }
+
+    private void sendRequest(final String json) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL("http://193.168.49.71:5000/api/add_news");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setDoOutput(true);
+
+                    OutputStream os = connection.getOutputStream();
+                    OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+                    osw.write(json);
+                    osw.flush();
+                    osw.close();
+                    os.close();
+                    System.out.println(json);
+
+                    int responseCode = connection.getResponseCode();
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(CreateNewsActivity.this, "Запись добавлена", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        Intent intent = new Intent(CreateNewsActivity.this, MainActivity.class);
+                        intent.putExtra("name", name);
+                        startActivity(intent);
+                        finish();
+                    } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(CreateNewsActivity.this, "Что-то пошло не так", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(CreateNewsActivity.this, "Произошла ошибка. Проверьте текст", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private String convertBitmapToBase64(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 }

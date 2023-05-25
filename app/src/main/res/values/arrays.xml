@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="categories">
-        <item>Спорт</item>
-        <item>Политика</item>
-        <item>Наука</item>
+        <item>Развлечение</item>
+        <item>Мир</item>
+        <item>Наши новости</item>
+        <item>Компьютерные технологии</item>
+        <item>Для детей</item>
     </string-array>
 </resources>
